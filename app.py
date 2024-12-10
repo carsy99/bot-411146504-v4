@@ -14,11 +14,11 @@ import re
 app = Flask(__name__)
 
 # 必須放上自己的Channel Access Token
-line_bot_api = LineBotApi('QGU5wq+Dv1teu+3jMNAerFywoBd08JJwhZ3/2Gpbglnj60/q/hFMpVjxq0yySVe7xBPgZMwqPV9CEtSAqbofjJWgC9iNfln30YfLzr1XQ47pQBJH2TUsX5CGDT4pZIA2rZkTPUhANDPujZDKoqBYwwdB04t89/1O/w1cDnyilFU=')
+line_bot_api = LineBotApi('kmUiIug3qAAl5+oeUiE0/AZ4TJi9XnqrWcC5ueBWrggXAqis6rZL0r9IQF7ok8gLU4Ylm1WHT4KXFc14aEL6w9U5OBsfsA3rW+HammtjS3OWDsQb5ThGo29HUqaOFw53fA/HM07ulL9no1PGGCyfLQdB04t89/1O/w1cDnyilFU=')
 # 必須放上自己的Channel Secret
-handler = WebhookHandler('dfe13d92b7d94bcd5ce29a07d85641d1')
+handler = WebhookHandler('bda44cf55ca9be9572b0c37f37869d41')
 
-line_bot_api.push_message('U367c14746ad6c3b1912419dbb5030c44', TextSendMessage(text='你可以開始了'))
+line_bot_api.push_message('U32fb03abdf35f40b41cfae94fb26d573', TextSendMessage(text='你可以開始了'))
 
 # 監聽所有來自 /callback 的 Post Request
 @app.route("/callback", methods=['POST'])
@@ -44,11 +44,24 @@ def callback():
 def handle_message(event):
     message = text=event.message.text
     if re.match('告訴我秘密',message):
-        audio_message = AudioSendMessage(
-            original_content_url='https://campus-studio.com/download/twsong.mp3',
-            duration=81000
+        confirm_template_message = TemplateSendMessage(
+            alt_text='這是TemplateSendMessage',
+            template=ConfirmTemplate(
+                text='你喜歡韓國嗎？',
+                actions=[
+                    PostbackAction(
+                        label='喜歡',
+                        display_text='超喜歡',
+                        data='action=其實不喜歡'
+                    ),
+                    MessageAction(
+                        label='讚',
+                        text='讚讚'
+                    )
+                ]
+            )
         )
-        line_bot_api.reply_message(event.reply_token, audio_message)
+        line_bot_api.reply_message(event.reply_token, confirm_template_message)
     else:
         line_bot_api.reply_message(event.reply_token, TextSendMessage(message))
 #主程式
